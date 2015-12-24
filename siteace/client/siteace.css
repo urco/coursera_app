@@ -1,0 +1,45 @@
+/* CSS declarations go here */
+.hidden_div{
+	display:none;
+}
+
+.search {
+	margin-bottom: 20px;
+}
+.add_url {
+	margin-bottom: 20px;
+}
+.back {
+	margin-top: 20px;
+}
+.avatar-image { 
+	border-radius: 50px;
+}
+.avatar .avatar-initials {
+	background-color: transparent !important;
+}
+
+/* Social buttons */
+
+.social-buttons{
+	margin-bottom:5rem;
+}
+
+.btnz {
+   display: block;
+   float: left;
+   padding: 10px 15px;
+   border:none;
+   background-color: #ececec;
+   text-decoration: none;
+   font-size: 18px;
+   color: #FFF;
+}
+ 
+.btnz:hover {
+   color: #efefef;
+}
+
+.social {
+	margin-top: 30px;
+}
