@@ -54,9 +54,15 @@ SearchSource.defineSource('items', function(searchText, options) {
       {description: regExp}
     ]};
       return Websites.find(selector, options).fetch();
-  } else {
+      } 
+      // return blank array when length of text searched is zero
+      else if (searchText.length===0){ 
+        return [];
+    } 
+   else  {
       return Websites.find({}, options).fetch();
   }
+
 });
 
 function buildRegExp(searchText) {

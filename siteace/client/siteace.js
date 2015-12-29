@@ -14,7 +14,9 @@ ShareIt.init({
   });
 //end social share  
 
-//Config comment box
+
+
+//config comment box
 
 Comments.ui.config({
    template: 'bootstrap', // or ionic, semantic-ui
@@ -25,7 +27,9 @@ Comments.ui.config({
 });
 // end config comment UI
 
-//search function
+
+
+//config search function
 
 var options = {
   keepHistory: 1000 * 60 * 5,
@@ -35,30 +39,43 @@ var options = {
 var fields = ['title','description'];
 
 itemSearch = new SearchSource('items', fields, options);
-
 //end search function
-
 
 // Routers 
 
-Router.configure({
-  layoutTemplate: 'ApplicationLayout'
-});
-
 Router.route('/', function () {
+  this.layout('MainLayout');
+
+   this.render('navigation', {
+    to:"navigation"
+  });
+
+   this.render('searchResult', {
+    to:"searchResult"
+  });
+
   this.render('website_form', {
     to:"website_form"
   });
   this.render('website_list', {
     to:"main"
   });
+  this.render('navigation', {
+    to:"navigation"
+  });
+  
+});
+
+Router.route('/details/:_id', function () {
+  this.layout('DetailsLayout');
+   
+   this.render('navigation', {
+    to:"navigation"
+  });
+
   this.render('searchResult', {
     to:"searchResult"
   });
-});
-
-
-Router.route('/details/:_id', function () {
   this.render('web_details', {
     to: "main",
     data:function(){
@@ -70,18 +87,20 @@ Router.route('/details/:_id', function () {
 
 
 /// accounts config
-
+/*
 Accounts.ui.config({
 passwordSignupFields: "USERNAME_AND_EMAIL"
 });
-
+*/
 /// 
+
+
 	// template helpers 
 	/////
- 	// helper function
+ 	
+ 	// Search helper
 
 	Template.searchResult.helpers({
-
 	   getItems: function() {
 	    return itemSearch.getData({
 	   	 	transform: function(matchText, regExp) {
@@ -98,9 +117,9 @@ passwordSignupFields: "USERNAME_AND_EMAIL"
 
 //This line return all documents by default (when empty searchbox text is empty)
 	
-	Template.searchResult.rendered = function() {
+	/*Template.searchResult.rendered = function() {
   		itemSearch.search('');
-	};
+	};*/
 	//
 
 	// helper function that returns all available websites
@@ -110,23 +129,226 @@ passwordSignupFields: "USERNAME_AND_EMAIL"
 		}
 	});
 
-	/*Template.web_details.helpers({
-		data:function() {
-      	return Websites.findOne({_id:this.params._id});
-  		}
-	});*/
+	Template.navigation.helpers({
+	   currentUser:function(){
+	   	return Meteor.user();
+	   }
+	});
 
 	/////
 	// template events 
 	/////
 
-	Template.searchBox.events({
+	Template.searchBox.events({   
 		  'keyup #search-box': _.throttle(function(e) {
 		    var text = $(e.target).val().trim();
 		    console.log(text);
-		    itemSearch.search(text,{});
+		    itemSearch.search(text,{});	
 		  }, 200)
 		});
+
+
+	Template.navigation.events({
+    'click .js-logout': function(event){
+        event.preventDefault();
+        Meteor.logout();
+    },
+      'click .js-register': function(event){
+      	$('#registerForm').modal('show') ;
+      	return false;
+    },
+      'click .js-login': function(event){
+            $('#login').modal('show') ;
+      	return false;
+    },
+});		
+
+	Template.login.events({
+    'submit form': function(event){
+        event.preventDefault();
+        /*var emailLogin = $('[name=emailLogin]').val();
+        var passwordLogin = $('[name=passwordLogin]').val();
+        console.log(emailLogin);
+        console.log(passwordLogin);
+     	  Meteor.loginWithPassword(emailLogin, passwordLogin, function(error){
+   		  if(error){
+          console.log(error.reason);
+          console.log("login o password incorrecto");
+
+        } else {
+          console.log("login correcto");
+          $('#login').modal('hide');
+          return false;
+            
+    		}
+        
+          
+            });       
+        }*/                 
+    }
+});
+
+  Template.register.events({
+      'submit form': function(event){
+        event.preventDefault();
+        /*var user = $('[name=user]').val();
+        var email = $('[name=email]').val();
+        var password = $('[name=password]').val();
+        
+        Accounts.createUser({
+          username: user,
+            email: email,
+            password: password
+        }, 
+          function(error){
+          if(error){
+              console.log(error.reason); // Output error if registration fails
+            } else{ 
+               $('#registerForm').modal('hide');
+             } 
+          });*/
+        
+      }     
+});     
+
+///
+
+// Validation Login and Register functions
+
+$.validator.setDefaults({
+    
+    rules: {
+        emailLogin: {
+            required: true,
+            email: true
+        },
+        passwordLogin: {
+            required: true,
+            minlength: 4
+        },
+        user: {
+            required: true,
+        }, 
+        email: {
+            required: true,
+            email: true
+        },
+        password: {
+          required: true,
+          minlength: 4
+        }
+    },
+    messages: {
+        emailLogin: {
+            required: "You must enter an email address.",
+            email: "You've entered an invalid email address."
+        },
+        passwordLogin: {
+            required: "You must enter a password.",
+            minlength: "Your password must be at least {0} characters."
+        },
+        user: {
+           required: "You must enter your username",
+        },
+        email: {
+            required: "You must enter an email address.",
+            email: "You've entered an invalid email address."
+        },
+        password: {
+            required: "You must enter a password.",
+            minlength: "Your password must be at least {0} characters."
+        }
+    }
+});
+
+// Login validation 
+
+  Template.login.onCreated(function(){
+          console.log("The 'login' template was just created.");  
+          /*var email='';
+          var password=''; */      
+        });
+
+  Template.login.onRendered(function(){
+      $(' .login').validate({
+        submitHandler: function(event){
+            var email = $('[name=emailLogin]').val();
+            var password = $('[name=passwordLogin]').val();
+            //console.log(email);
+            console.log(password);
+            Meteor.loginWithPassword(email, password, function(error){
+            if(error){
+              console.log(error.reason);
+              console.log("login o password incorrecto");
+
+            } else {
+              console.log("login correcto");
+              $('#login').modal('hide');
+              
+              }   
+            });      
+          }
+       }); // end validate function  
+     });  //end main rendered function
+        
+  Template.login.onDestroyed(function(){
+          console.log("The 'login' template was just destroyed.");
+        });  
+///
+
+// Register validation
+
+  Template.register.onCreated(function(){
+          console.log("The 'register' template was just created.");         
+        });
+
+  Template.register.onRendered(function(){
+         
+         $(' .register').validate({
+            submitHandler: function(event){
+            var user = $('[name=user]').val();
+            var email = $('[name=email]').val();
+            var password = $('[name=password]').val();
+            console.log(email);
+            console.log(password);
+            Accounts.createUser({
+              username: user,
+              email: email,
+              password: password
+        }, 
+            function(error){
+          if(error){
+              console.log(error.reason); // Output error if registration fails
+            } else{ 
+               $('#registerForm').modal('hide');
+             } 
+          }); 
+          }
+       }); // end validate function   
+         /*var user = $('[name=user]').val();
+        var email = $('[name=email]').val();
+        var password = $('[name=password]').val();
+        
+        Accounts.createUser({
+          username: user,
+            email: email,
+            password: password
+        }, 
+          function(error){
+          if(error){
+              console.log(error.reason); // Output error if registration fails
+            } else{ 
+               $('#registerForm').modal('hide');
+             } 
+          });*/
+        
+      });
+
+  Template.register.onDestroyed(function(){
+          console.log("The 'register' template was just destroyed.");
+      });  
+
+/// end validation
 
 
 	Template.website_item.events({

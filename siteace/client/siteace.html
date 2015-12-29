@@ -1,36 +1,119 @@
 <head>
   <title>Website Aggregator</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+ <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="website aggregator">
+    <meta name="Javi Rey" content="">
 </head>
 
 <body>
-	<!-- navbar  - you will be putting the login functions here -->
-	
-	<nav class="navbar navbar-default">
-	  <div class="container-fluid">
-	  	{{> loginButtons align="right"}}
-	    <div class="navbar-header">
-	      <a class="navbar-brand" href="#">
-	        Social website aggregator
-	      </a>
-	    </div>
-	  </div>
-	</nav>
-	
-<div class="container">
-		{{> searchBox}}
-		<!--{{> searchResult}}-->
-	</div>
+	{{> register}}
+	{{> login}}
+	<!--{{> loginButtons}}-->
 </body>
 
-<!-- layout template-->
+<!-- Router layouts template-->
 
-<template name="ApplicationLayout">
-	 <!--{{> yield "navbar"}}-->
+<template name="navigation">
+<!-- navbar  - you will be putting the login functions here -->
+		<nav class="navbar navbar-default">
+		  <div class="container-fluid">
+		  	<!-- {{> loginButtons align="right"}} -->
+			 <ul>
+			    {{#if currentUser}}
+			        <li><a href="#" class="js-logout">Logout</a></li>
+			        <p>User: <b>{{currentUser.username}}</b></p> 
+			    {{else}}
+			        <li><a href="#" class="js-register">Register</a></li>
+			        <li><a href="#" class="js-login">Login</a></li>
+			    {{/if}}
+			</ul>
+		    <div class="navbar-header">
+		      <a class="navbar-brand" href="#">
+		        Social website aggregator
+		      </a>
+		    </div>
+		  </div>
+		</nav>
+		<div class="container">
+			{{> searchBox}}
+		</div>
+</template>
+
+<template name="MainLayout">
+	{{> yield "navigation"}}	
+	<div class="container"> 
 	 {{> yield "website_form"}}
 	 {{> yield "searchResult"}}
   	 {{> yield "main"}}
+  	</div> 
 </template>
+
+<template name="DetailsLayout">
+{{> yield "navigation"}}	
+	<div class="container">		
+	  {{> yield "searchResult"}}	
+	  {{> yield "main"}}
+  	</div> 
+</template>
+
+<!-- template register -->
+
+<template name="register">
+		<div class="modal fade" id="registerForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		  	<div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title" id="myModalLabel">Register</h4>
+		      </div>
+		      <div class="modal-body">
+		        <form class="register">
+			        <p>User: <input type="text" name="user"></p>	
+			        <p>Email: <input type="email" name="email"></p>
+			        <p>Password: <input type="password" name="password"></p>
+			        <button type="submit" class="btn btn-primary" value="Register">Create account</button>
+		    	</form>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		        <!--<button type="submit" value="Register" class="btn btn-primary js-confirm-register">Save changes</button>-->
+		      </div>
+		    </div>
+		  </div>
+	</div>
+</template>
+
+<!-- template login -->
+
+<template name="login">
+    <div class="modal fade" id="login" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		  	<div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <h4 class="modal-title" id="myModalLabel">Login</h4>
+		      </div>
+		      <div class="modal-body">
+		        <form class="login">
+			        <p>email: <input type="email" name="emailLogin" placeholder="email"></p>	
+			        <p>password: <input type="password" name="passwordLogin" placeholder="password"></p>
+			        <button type="submit" class="btn btn-primary" value="Login">Login</button>
+		    	</form>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		        <!--<button type="submit" value="Register" class="btn btn-primary js-confirm-register">Save changes</button>-->
+		      </div>
+		    </div>
+		  </div>
+	</div>
+</template>
+
+<!--template comments-->
 
 <template name="myComments">
     <ul>
@@ -130,21 +213,45 @@
 <!-- template that displays searched website items  -->
 <template name="searchResult">
 	<div class="container">
-		<div class="jumbotron">	
+		<div class="jumbotron searchResult">	
 			<h3> Search results </h3>
 				<ol>
 					{{#each getItems}}
-						{{> website_item}}		
+						{{> website_item_search}}		
 					{{/each}}
 				</ol>
-			<div id="search-meta">
+			<!--<div id="search-meta">
 	      		{{#if isLoading}}
 	        		searching ...
 	      		{{/if}}
-    		</div>
+    		</div>-->
 		</div>	
 	</div>
 </template>	
+
+
+<!-- template that displays individual websites found entries -->
+<template name="website_item_search">
+	<li>
+		<a href="{{url}}">{{title}}</a>
+		<p>
+			{{description}}
+		</p>
+		<a href="#" class="btn btn-success"><span>Upvote</span>
+					{{upvote}}
+		</a>	
+		<a href="#" class="btn btn-danger"><span>Downvote</span>
+					{{downvote}}
+		</a>
+		<p>
+		 Created On: {{createdOn}}
+		</p>
+		<a href="/details/{{_id}}" class="btn btn-success js-description">
+					view web description
+		</a>	
+		<!-- you will be putting your up and down vote buttons in here! -->
+	</li>
+</template>
 
 <!-- template that displays individual website entries -->
 <template name="website_item">
