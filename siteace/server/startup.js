@@ -3,6 +3,12 @@
 
 
 Meteor.startup(function () {
+  
+  Accounts.urls.resetPassword = function(token) {
+    return Meteor.absoluteUrl('reset-password/' + token);
+  };
+
+ process.env.MAIL_URL = 'smtp://postmaster@sandbox757c0ce5316a4945a22181bb9b4060e9.mailgun.org:d4ba89f36403b402f5717fc5e28cb769@smtp.mailgun.org:587';
 
     // code to run on server at startup
     if (!Websites.findOne()){

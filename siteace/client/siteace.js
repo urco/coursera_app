@@ -1,3 +1,8 @@
+//config reset password
+if (Accounts._resetPasswordToken) {
+  Session.set('resetPasswordToken', Accounts._resetPasswordToken);
+}
+
 //config social shared
 
 ShareIt.init({
@@ -14,8 +19,6 @@ ShareIt.init({
   });
 //end social share  
 
-
-
 //config comment box
 
 Comments.ui.config({
@@ -26,8 +29,6 @@ Comments.ui.config({
    defaultAvatar: 'https://s3.amazonaws.com/uifaces/faces/twitter/brynn/73.jpg' // default
 });
 // end config comment UI
-
-
 
 //config search function
 
@@ -42,6 +43,8 @@ itemSearch = new SearchSource('items', fields, options);
 //end search function
 
 // Routers 
+
+//Router Home
 
 Router.route('/', function () {
   this.layout('MainLayout');
@@ -66,6 +69,8 @@ Router.route('/', function () {
   
 });
 
+// Router Details
+
 Router.route('/details/:_id', function () {
   this.layout('DetailsLayout');
    
@@ -83,21 +88,29 @@ Router.route('/details/:_id', function () {
     }
   });
 });	
-// End routers
 
+//Router reset password
 
-/// accounts config
-/*
-Accounts.ui.config({
-passwordSignupFields: "USERNAME_AND_EMAIL"
+  Router.route('/reset-password/:token', function () {
+    Session.set('resetPasswordToken', this.params.token);
+    this.layout('ResetLayout');
+
+    this.render('ResetPassword', {
+    to:"ResetPassword"
+    });
 });
-*/
-/// 
-
 
 	// template helpers 
 	/////
- 	
+
+//Reset Passwordl helper 
+
+Template.ResetPassword.helpers({
+ resetPassword: function(){
+    return Session.get('resetPasswordToken');
+  }
+});
+
  	// Search helper
 
 	Template.searchResult.helpers({
@@ -109,18 +122,10 @@ passwordSignupFields: "USERNAME_AND_EMAIL"
 	      sort: {upvote: -1}
 	    });
 	  },
-	  
 	  isLoading: function() {
 	    return itemSearch.getStatus().loading;
 	  	}
 	});
-
-//This line return all documents by default (when empty searchbox text is empty)
-	
-	/*Template.searchResult.rendered = function() {
-  		itemSearch.search('');
-	};*/
-	//
 
 	// helper function that returns all available websites
 	Template.website_list.helpers({
@@ -135,9 +140,8 @@ passwordSignupFields: "USERNAME_AND_EMAIL"
 	   }
 	});
 
-	/////
+	///
 	// template events 
-	/////
 
 	Template.searchBox.events({   
 		  'keyup #search-box': _.throttle(function(e) {
@@ -163,54 +167,30 @@ passwordSignupFields: "USERNAME_AND_EMAIL"
     },
 });		
 
-	Template.login.events({
-    'submit form': function(event){
-        event.preventDefault();
-        /*var emailLogin = $('[name=emailLogin]').val();
-        var passwordLogin = $('[name=passwordLogin]').val();
-        console.log(emailLogin);
-        console.log(passwordLogin);
-     	  Meteor.loginWithPassword(emailLogin, passwordLogin, function(error){
-   		  if(error){
-          console.log(error.reason);
-          console.log("login o password incorrecto");
-
-        } else {
-          console.log("login correcto");
-          $('#login').modal('hide');
-          return false;
-            
-    		}
-        
-          
-            });       
-        }*/                 
+  Template.login.events({
+    'click .js-register': function(event){
+        $('#login').modal('hide');
+        $('#registerForm').modal('show');
+    },
+    'click .js-recover-password': function(event){
+        $('#login').modal('hide');
+        $('#ForgotPassword').modal('show');
     }
-});
+}); 
 
   Template.register.events({
-      'submit form': function(event){
-        event.preventDefault();
-        /*var user = $('[name=user]').val();
-        var email = $('[name=email]').val();
-        var password = $('[name=password]').val();
-        
-        Accounts.createUser({
-          username: user,
-            email: email,
-            password: password
-        }, 
-          function(error){
-          if(error){
-              console.log(error.reason); // Output error if registration fails
-            } else{ 
-               $('#registerForm').modal('hide');
-             } 
-          });*/
-        
-      }     
+     'click .js-login': function(event){
+        $('#registerForm').modal('hide');
+        $('#login').modal('show');          
+    }
 });     
 
+  Template.ForgotPassword.events({
+     'click .js-register': function(event){
+        $('#ForgotPassword').modal('hide');
+        $('#registerForm').modal('show');          
+    }
+}); 
 ///
 
 // Validation Login and Register functions
@@ -261,33 +241,39 @@ $.validator.setDefaults({
     }
 });
 
-// Login validation 
+///
+
+// Login validation process
 
   Template.login.onCreated(function(){
-          console.log("The 'login' template was just created.");  
-          /*var email='';
-          var password=''; */      
+          console.log("The 'login' template was just created.");       
         });
 
   Template.login.onRendered(function(){
-      $(' .login').validate({
+      var validator = $(' .login').validate({
         submitHandler: function(event){
             var email = $('[name=emailLogin]').val();
-            var password = $('[name=passwordLogin]').val();
-            //console.log(email);
-            console.log(password);
+            var password = $('[name=passwordLogin]').val();    
             Meteor.loginWithPassword(email, password, function(error){
+            
             if(error){
-              console.log(error.reason);
-              console.log("login o password incorrecto");
-
-            } else {
-              console.log("login correcto");
-              $('#login').modal('hide');
-              
-              }   
-            });      
-          }
+              if(error.reason == "User not found") {
+                validator.showErrors({
+                  emailLogin: "email not found"   
+                });
+              } 
+              if(error.reason == "Incorrect password") {
+                validator.showErrors({
+                  passwordLogin: "password incorrect"    
+                });
+              } 
+              /*console.log(error.reason);
+              console.log("login o password incorrecto");*/
+             } else {
+                $('#login').modal('hide');
+              }//end if error
+          });      
+         }
        }); // end validate function  
      });  //end main rendered function
         
@@ -296,60 +282,52 @@ $.validator.setDefaults({
         });  
 ///
 
-// Register validation
+// Register validation process
 
   Template.register.onCreated(function(){
           console.log("The 'register' template was just created.");         
         });
 
   Template.register.onRendered(function(){
-         
-         $(' .register').validate({
-            submitHandler: function(event){
+          var validator = $(' .register').validate({
+          submitHandler: function(event){
             var user = $('[name=user]').val();
             var email = $('[name=email]').val();
             var password = $('[name=password]').val();
+            console.log(user);
             console.log(email);
             console.log(password);
             Accounts.createUser({
               username: user,
               email: email,
               password: password
-        }, 
+          }, 
             function(error){
-          if(error){
-              console.log(error.reason); // Output error if registration fails
-            } else{ 
-               $('#registerForm').modal('hide');
-             } 
-          }); 
+            if(error) {
+              if(error.reason == "Email already exists."){
+               validator.showErrors({
+               email: error.reason
+                  });
+                }
+               if(error.reason == "Username already exists."){
+               validator.showErrors({
+               user: error.reason
+                  });
+                }
+                console.log(error.reason); // Output error if registration fails
+              } else{ 
+                 $('#registerForm').modal('hide');
+               } 
+            }); 
           }
-       }); // end validate function   
-         /*var user = $('[name=user]').val();
-        var email = $('[name=email]').val();
-        var password = $('[name=password]').val();
-        
-        Accounts.createUser({
-          username: user,
-            email: email,
-            password: password
-        }, 
-          function(error){
-          if(error){
-              console.log(error.reason); // Output error if registration fails
-            } else{ 
-               $('#registerForm').modal('hide');
-             } 
-          });*/
-        
-      });
+      }); // end validate function          
+  });
 
   Template.register.onDestroyed(function(){
           console.log("The 'register' template was just destroyed.");
       });  
 
-/// end validation
-
+/// 
 
 	Template.website_item.events({
 		"click .js-upvote":function(event){
@@ -412,3 +390,47 @@ $.validator.setDefaults({
     		
 	   }
 	});
+
+
+Template.ResetPassword.events({
+  'submit .resetPasswordForm': function(e, t) {
+    e.preventDefault();
+    var resetPasswordForm = $(e.currentTarget),
+        password = resetPasswordForm.find('#resetPasswordPassword').val(),
+        passwordConfirm = resetPasswordForm.find('#resetPasswordPasswordConfirm').val();
+        Accounts.resetPassword(Session.get('resetPasswordToken'), password, function(err) {
+        if (err) {
+          console.log('We are sorry but something went wrong.');
+        } else {
+          console.log('Your password has been changed. Welcome back!');
+          Session.set('resetPassword', null);
+          Router.go('/');
+        }
+      });
+    return false;
+  }
+});
+
+Template.ForgotPassword.events({
+  'submit .ForgotPasswordForm': function(e, t) {
+    e.preventDefault();
+ 
+    var forgotPasswordForm = $(e.currentTarget),
+        email = forgotPasswordForm.find('#forgotPasswordEmail').val().toLowerCase();
+ 
+      Accounts.forgotPassword({email: email}, function(err) {
+        if (err) {
+          if (err.message === 'User not found [403]') {
+            console.log('This email does not exist.');
+          } else {
+            console.log('We are sorry but something went wrong.');
+          }
+        } else {
+            console.log('Email Sent. Check your mailbox.');
+            console.log(email);
+        }
+      });
+
+    return false;
+  },
+});
