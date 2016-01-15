@@ -13,8 +13,6 @@
 	{{> register}}
 	{{> login}}
 	{{> ForgotPassword}}
-	<!--{{> ResetPassword}}-->
-	<!--{{> loginButtons}}-->
 </body>
 
 <!-- Router layouts template-->
@@ -27,7 +25,7 @@
 			 <ul>
 			    {{#if currentUser}}
 			        <li><a href="#" class="js-logout">Logout</a></li>
-			        <p>User: <b>{{currentUser.username}}</b></p> 
+			        <p>User: <b>{{currentUser.username}}</b><b>{{currentUser.services.facebook.name}}</b></p> 
 			    {{else}}
 			        <li><a href="#" class="js-register">Register</a></li>
 			        <li><a href="#" class="js-login">Login</a></li>
@@ -76,21 +74,30 @@
 		  	<div class="modal-dialog" role="document">
 		    <div class="modal-content">
 		      <div class="modal-header">
-		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <button type="button" class="close js-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 		        <h4 class="modal-title" id="myModalLabel">Register</h4>
 		      </div>
 		      <div class="modal-body">
 		        <form class="register">
-			        <p>User: <input type="text" name="user"></p>	
-			        <p>Email: <input type="email" name="email"></p>
-			        <p>Password: <input type="password" name="password"></p>
-			        <button type="submit" class="btn btn-primary" value="Register">Create account</button>
+		        	<div class="form-group">
+				       	 <label>User</label> 
+				       	 <input type="text" name="user" placeholder="user" value="" class="form-control">	
+			       	</div> 
+			       	<div class="form-group">
+				        <label>Email</label>
+				        <input type="email" name="email" placeholder="email" value="" class="form-control">
+			    	</div>
+			    	<div class="form-group">
+			        	<label>Password</label> 
+			        	<input type="password" name="password" placeholder="password" value="" class="form-control">
+			    	</div>
+			        <button type="submit" class="btn btn-success" value="Register">Create account</button>
 		    	</form>
 		      <p>or <a href="#" class="js-login">Login</a></p>
 		      </div>
 		      <div class="modal-footer">
-		      	<p><a href="#" class="btn btn-primary">Register with Facebook</a></p>
-		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		      	<p><a href="#" class="btn btn-primary facebook-login">Login with Facebook</a></p>
+		        <button type="button" class="btn btn-default js-close" data-dismiss="modal">Close</button>
 		        <!--<button type="submit" value="Register" class="btn btn-primary js-confirm-register">Save changes</button>-->
 		      </div>
 		    </div>
@@ -105,21 +112,27 @@
 		  	<div class="modal-dialog" role="document">
 		    <div class="modal-content">
 		      <div class="modal-header">
-		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <button type="button" class="close js-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 		        <h4 class="modal-title" id="myModalLabel">Login</h4>
 		      </div>
 		      <div class="modal-body">
 		        <form class="login">
-			        <p>email: <input type="email" name="emailLogin" placeholder="email"></p>	
-			        <p>password: <input type="password" name="passwordLogin" placeholder="password"></p>
-			        <button type="submit" class="btn btn-primary" value="Login">Login</button>
-			        <p><a href="#" class="js-recover-password">forgot your password?</a></p>
-			        <p>Not a member yet?<a href="#" class="js-register">Join us!</a></p>
+		        	<div class="form-group">
+				        <label>Email</label>
+				        <input type="email" name="emailLogin" placeholder="email" class="form-control">	
+				    </div>
+				    <div class="form-group">    
+				    	<label>Password</label>
+				        <input type="password" name="passwordLogin" placeholder="password" class="form-control">
+				    </div>    
+				        <button type="submit" class="btn btn-success" value="Login">Login</button>
+				        <p><a href="#" class="js-recover-password">forgot your password?</a></p>
+				        <p>Not a member yet?<a href="#" class="js-register">Join us!</a></p>
 		    	</form>
 		      </div>
 		      <div class="modal-footer">
-		      	<p><a href="#"  class="btn btn-primary">Login with Facebook</a></p>
-		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		      	<button class="btn btn-primary facebook-login"> Login with Facebook</button>
+		        <button type="button" class="btn btn-default js-close" data-dismiss="modal">Close</button>
 		        <!--<button type="submit" value="Register" class="btn btn-primary js-confirm-register">Save changes</button>-->
 		      </div>
 		    </div>
@@ -134,19 +147,22 @@
 		  	<div class="modal-dialog" role="document">
 		    <div class="modal-content">
 		      <div class="modal-header">
-		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		        <button type="button" class="close js-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 		        <h4 class="modal-title" id="myModalLabel">Recover password</h4>
 		      </div>
 		      <div class="modal-body">
-		        <form action="/reset-password " class="ForgotPasswordForm" method="post">
-			        <p>email: <input id="forgotPasswordEmail" type="text" name="email" placeholder="email"></p>	
-			        <button type="submit" class="btn btn-primary" value="Send">Submit</button>
+		        <form  class="ForgotPasswordForm" method="post">
+		        	<div class="form-group">   
+				        <label>Email</label> 
+				        <input id="forgotPasswordEmail" type="email" name="emailRecover" placeholder="email" class="form-control" autocomplete="off">
+			    	</div>
+			        <button type="submit" class="btn btn-success" value="Send">Submit</button>
 			        <p>Not a member yet?<a href="#" class="js-register">Join us!</a></p>
 		    	</form>
 		      </div>
 		      <div class="modal-footer">
 		      	<!--<p><a href="#"  class="btn btn-primary">Login with Facebook</a></p>-->
-		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		        <button type="button" class="btn btn-default js-close" data-dismiss="modal">Close</button>
 		        <!--<button type="submit" value="Register" class="btn btn-primary js-confirm-register">Save changes</button>-->
 		      </div>
 		    </div>
@@ -221,7 +237,6 @@
 	</div>
 
 </template>	
-
 
 
 <template name="website_form">

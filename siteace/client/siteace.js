@@ -1,14 +1,28 @@
+
 //config reset password
 if (Accounts._resetPasswordToken) {
   Session.set('resetPasswordToken', Accounts._resetPasswordToken);
 }
 
-//config social shared
+//config login facebook
+/* 
+ServiceConfiguration.configurations.remove({
+    service: 'facebook'
+});
+
+
+ServiceConfiguration.configurations.insert({
+    service: 'facebook',
+    appId: '1533956880254163',
+    secret: '3a92463bbaae8700d0c5d2915e24c75c'
+});*/
+
+//config social share
 
 ShareIt.init({
     siteOrder: ['facebook','twitter'],
     sites: {
-      'facebook': {
+        'facebook': {
         'appId': '1533956880254163',
         'version': 'v2.3',
         'buttonText': 'Share on facebook'
@@ -100,6 +114,8 @@ Router.route('/details/:_id', function () {
     });
 });
 
+//end routers
+
 	// template helpers 
 	/////
 
@@ -158,30 +174,60 @@ Template.ResetPassword.helpers({
         Meteor.logout();
     },
       'click .js-register': function(event){
-      	$('#registerForm').modal('show') ;
-      	return false;
+        event.preventDefault();
+        $('.register').trigger("reset");
+      	$('#registerForm').modal('show') ;    	
     },
       'click .js-login': function(event){
+             event.preventDefault();
+            $('.login').trigger("reset");
             $('#login').modal('show') ;
-      	return false;
+      	
     },
 });		
 
   Template.login.events({
+    'click .facebook-login': function(event) {
+        Meteor.loginWithFacebook({loginStyle:"redirect"}, function(err){
+            if (err) {
+                throw new Meteor.Error("Facebook login failed");
+            }
+        });
+       $('#login').modal('hide') ; 
+    },
     'click .js-register': function(event){
+        $('.register').trigger("reset");
         $('#login').modal('hide');
         $('#registerForm').modal('show');
     },
+    'click .js-close': function(event){
+        $(' .error').html('');
+        $(' .error').removeClass('error');
+    },
     'click .js-recover-password': function(event){
+        $('.ForgotPasswordForm').trigger("reset");
         $('#login').modal('hide');
         $('#ForgotPassword').modal('show');
     }
 }); 
 
   Template.register.events({
+      'click .facebook-login': function(event) {
+        Meteor.loginWithFacebook({loginStyle:"redirect"}, function(err){
+            if (err) {
+                throw new Meteor.Error("Facebook login failed");
+            }
+        });
+       $('#registerForm').modal('hide'); 
+    },
      'click .js-login': function(event){
+        $('.login').trigger("reset");
         $('#registerForm').modal('hide');
         $('#login').modal('show');          
+    },
+    'click .js-close': function(event){
+        $(' .error').html('');
+        $(' .error').removeClass('error');
     }
 });     
 
@@ -189,6 +235,10 @@ Template.ResetPassword.helpers({
      'click .js-register': function(event){
         $('#ForgotPassword').modal('hide');
         $('#registerForm').modal('show');          
+    },
+    'click .js-close': function(event){ 
+     $(' .error').html('');
+     $(' .error').removeClass('error');
     }
 }); 
 ///
@@ -216,6 +266,10 @@ $.validator.setDefaults({
         password: {
           required: true,
           minlength: 4
+        },
+        emailRecover: {
+            required: false,
+            email: true
         }
     },
     messages: {
@@ -234,6 +288,10 @@ $.validator.setDefaults({
             required: "You must enter an email address.",
             email: "You've entered an invalid email address."
         },
+        emailRecover: {
+            required: "You must enter an email address.",
+            email: "You've entered an invalid email address."
+        },
         password: {
             required: "You must enter a password.",
             minlength: "Your password must be at least {0} characters."
@@ -245,13 +303,16 @@ $.validator.setDefaults({
 
 // Login validation process
 
+
   Template.login.onCreated(function(){
-          console.log("The 'login' template was just created.");       
+          console.log("The 'login' template was just created."); 
+
         });
 
   Template.login.onRendered(function(){
       var validator = $(' .login').validate({
         submitHandler: function(event){
+
             var email = $('[name=emailLogin]').val();
             var password = $('[name=passwordLogin]').val();    
             Meteor.loginWithPassword(email, password, function(error){
@@ -266,9 +327,8 @@ $.validator.setDefaults({
                 validator.showErrors({
                   passwordLogin: "password incorrect"    
                 });
-              } 
-              /*console.log(error.reason);
-              console.log("login o password incorrecto");*/
+               } 
+              
              } else {
                 $('#login').modal('hide');
               }//end if error
@@ -279,13 +339,14 @@ $.validator.setDefaults({
         
   Template.login.onDestroyed(function(){
           console.log("The 'login' template was just destroyed.");
+
         });  
 ///
 
 // Register validation process
 
-  Template.register.onCreated(function(){
-          console.log("The 'register' template was just created.");         
+  Template.register.onCreated(function(){   
+          console.log("The 'register' template was just created.");     
         });
 
   Template.register.onRendered(function(){
@@ -315,7 +376,7 @@ $.validator.setDefaults({
                   });
                 }
                 console.log(error.reason); // Output error if registration fails
-              } else{ 
+              } else { 
                  $('#registerForm').modal('hide');
                } 
             }); 
@@ -326,6 +387,73 @@ $.validator.setDefaults({
   Template.register.onDestroyed(function(){
           console.log("The 'register' template was just destroyed.");
       });  
+
+
+
+  Template.ForgotPassword.onCreated(function(){
+          console.log("The 'ForgotPassword' template was just created.");   
+
+        });
+
+  Template.ForgotPassword.onRendered(function(){
+      var validator = $(' .ForgotPasswordForm').validate({
+        submitHandler: function(event){      
+             var email = $('[name=emailRecover]').val();
+             console.log(email);
+              
+              Accounts.forgotPassword({email:email}, function(error) {
+                if (error) {
+                   console.log(error.reason);
+                    if (error.reason == 'User not found') {
+                          console.log('This email does not exist.');
+                          validator.showErrors({
+                            emailRecover: "email not found"
+                          });  
+                          
+                      } 
+                }else {
+                    console.log('Email Sent. Check your mailbox.');
+                    console.log(email);
+                }
+              /*$('#ForgotPassword').modal('hide');*/
+            });
+         }//end if error 
+
+      }); 
+    });  
+        
+  Template.ForgotPassword.onDestroyed(function(){
+          console.log("The 'ForgotPassword' template was just destroyed.");
+        });  
+
+
+
+/*
+Template.ForgotPassword.events({
+  'submit .ForgotPasswordForm': function(e, t) {
+    e.preventDefault();
+ 
+    var forgotPasswordForm = $(e.currentTarget),
+        email = forgotPasswordForm.find('#forgotPasswordEmail').val().toLowerCase();
+ 
+      Accounts.forgotPassword({email: email}, function(err) {
+        if (err) {
+          if (err.message === 'User not found [403]') {
+            console.log('This email does not exist.');
+          } else {
+            console.log('We are sorry but something went wrong.');
+          }
+        } else {
+            console.log('Email Sent. Check your mailbox.');
+            console.log(email);
+        }
+      });
+
+    return false;
+  },
+});
+
+*/
 
 /// 
 
@@ -411,26 +539,3 @@ Template.ResetPassword.events({
   }
 });
 
-Template.ForgotPassword.events({
-  'submit .ForgotPasswordForm': function(e, t) {
-    e.preventDefault();
- 
-    var forgotPasswordForm = $(e.currentTarget),
-        email = forgotPasswordForm.find('#forgotPasswordEmail').val().toLowerCase();
- 
-      Accounts.forgotPassword({email: email}, function(err) {
-        if (err) {
-          if (err.message === 'User not found [403]') {
-            console.log('This email does not exist.');
-          } else {
-            console.log('We are sorry but something went wrong.');
-          }
-        } else {
-            console.log('Email Sent. Check your mailbox.');
-            console.log(email);
-        }
-      });
-
-    return false;
-  },
-});
