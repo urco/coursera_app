@@ -4,6 +4,7 @@ if (Accounts._resetPasswordToken) {
   Session.set('resetPasswordToken', Accounts._resetPasswordToken);
 }
 
+
 //config login facebook
 /* 
 ServiceConfiguration.configurations.remove({
@@ -153,7 +154,15 @@ Template.ResetPassword.helpers({
 	Template.navigation.helpers({
 	   currentUser:function(){
 	   	return Meteor.user();
-	   }
+	   },
+     userPicHelper: function() {
+    if (Meteor.user().services.facebook) {
+        return 'http://graph.facebook.com/' + Meteor.user().services.facebook.id + '/picture?type=square&height=160&width=160';
+      }
+    else {
+        return 'https://s3.amazonaws.com/uifaces/faces/twitter/brynn/73.jpg'
+      }
+    }
 	});
 
 	///
@@ -170,16 +179,16 @@ Template.ResetPassword.helpers({
 
 	Template.navigation.events({
     'click .js-logout': function(event){
-        event.preventDefault();
+        /*event.preventDefault();*/
         Meteor.logout();
     },
       'click .js-register': function(event){
-        event.preventDefault();
+        /*event.preventDefault();*/
         $('.register').trigger("reset");
       	$('#registerForm').modal('show') ;    	
     },
       'click .js-login': function(event){
-             event.preventDefault();
+            /*event.preventDefault();*/
             $('.login').trigger("reset");
             $('#login').modal('show') ;
       	
@@ -302,7 +311,6 @@ $.validator.setDefaults({
 ///
 
 // Login validation process
-
 
   Template.login.onCreated(function(){
           console.log("The 'login' template was just created."); 

@@ -1,3 +1,4 @@
+
 <head>
   <title>Website Aggregator</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
@@ -22,15 +23,26 @@
 		<nav class="navbar navbar-default">
 		  <div class="container-fluid">
 		  	<!-- {{> loginButtons align="right"}} -->
-			 <ul>
+			 
+			<ul class="nav navbar-nav pull-right navbar-text">
 			    {{#if currentUser}}
-			        <li><a href="#" class="js-logout">Logout</a></li>
-			        <p>User: <b>{{currentUser.username}}</b><b>{{currentUser.services.facebook.name}}</b></p> 
+			    		<li> <img src="{{userPicHelper}}" class="pic-profile"> </li>	
+				    	<li class="dropdown pull-right">
+				    		<a href="#" class="dropdown-toggle" data-toggle="dropdown" > 
+				    			<b>{{currentUser.username}}</b><b>{{currentUser.services.facebook.first_name}}</b><span class="caret"></span> 
+				    		</a>
+					    	<ul class="dropdown-menu">
+								<li><a href="#" class="js-logout text-center">Logout</a></li>
+					    	</ul>		
+					    </li> 	
+				    	<!--<li><a href="#"><b>{{currentUser.username}}</b><b>{{currentUser.services.facebook.first_name}}</b></a></li>-->
+				        <!--<li><a href="#" class="js-logout">Logout</a></li>--> 
 			    {{else}}
 			        <li><a href="#" class="js-register">Register</a></li>
 			        <li><a href="#" class="js-login">Login</a></li>
 			    {{/if}}
 			</ul>
+
 		    <div class="navbar-header">
 		      <a class="navbar-brand" href="#">
 		        Social website aggregator
@@ -91,7 +103,7 @@
 			        	<label>Password</label> 
 			        	<input type="password" name="password" placeholder="password" value="" class="form-control">
 			    	</div>
-			        <button type="submit" class="btn btn-success" value="Register">Create account</button>
+			        <button type="submit" class="btn btn-success btn-register" value="Register">Sign Up</button>
 		    	</form>
 		      <p>or <a href="#" class="js-login">Login</a></p>
 		      </div>
@@ -125,13 +137,13 @@
 				    	<label>Password</label>
 				        <input type="password" name="passwordLogin" placeholder="password" class="form-control">
 				    </div>    
-				        <button type="submit" class="btn btn-success" value="Login">Login</button>
+				        <button type="submit" class="btn btn-success btn-login" value="Login">Login</button>
 				        <p><a href="#" class="js-recover-password">forgot your password?</a></p>
 				        <p>Not a member yet?<a href="#" class="js-register">Join us!</a></p>
 		    	</form>
 		      </div>
 		      <div class="modal-footer">
-		      	<button class="btn btn-primary facebook-login"> Login with Facebook</button>
+		      	<button class="btn btn-primary facebook-login">Login with Facebook</button>
 		        <button type="button" class="btn btn-default js-close" data-dismiss="modal">Close</button>
 		        <!--<button type="submit" value="Register" class="btn btn-primary js-confirm-register">Save changes</button>-->
 		      </div>
