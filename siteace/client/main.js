@@ -1,22 +1,13 @@
+    // Suscribe 
+
+Meteor.subscribe('websites');
+Meteor.subscribe('userData');
+Meteor.subscribe('comments');
 
 //config reset password
 if (Accounts._resetPasswordToken) {
   Session.set('resetPasswordToken', Accounts._resetPasswordToken);
 }
-
-
-//config login facebook
-/* 
-ServiceConfiguration.configurations.remove({
-    service: 'facebook'
-});
-
-
-ServiceConfiguration.configurations.insert({
-    service: 'facebook',
-    appId: '1533956880254163',
-    secret: '3a92463bbaae8700d0c5d2915e24c75c'
-});*/
 
 //config social share
 
@@ -75,13 +66,11 @@ Router.route('/', function () {
   this.render('website_form', {
     to:"website_form"
   });
+  
   this.render('website_list', {
     to:"main"
   });
-  this.render('navigation', {
-    to:"navigation"
-  });
-  
+
 });
 
 // Router Details
@@ -92,10 +81,11 @@ Router.route('/details/:_id', function () {
    this.render('navigation', {
     to:"navigation"
   });
-
+/*
   this.render('searchResult', {
     to:"searchResult"
-  });
+  });*/
+
   this.render('web_details', {
     to: "main",
     data:function(){
@@ -397,6 +387,7 @@ $.validator.setDefaults({
       });  
 
 
+// ForgotPassword template
 
   Template.ForgotPassword.onCreated(function(){
           console.log("The 'ForgotPassword' template was just created.");   
@@ -435,34 +426,6 @@ $.validator.setDefaults({
         });  
 
 
-
-/*
-Template.ForgotPassword.events({
-  'submit .ForgotPasswordForm': function(e, t) {
-    e.preventDefault();
- 
-    var forgotPasswordForm = $(e.currentTarget),
-        email = forgotPasswordForm.find('#forgotPasswordEmail').val().toLowerCase();
- 
-      Accounts.forgotPassword({email: email}, function(err) {
-        if (err) {
-          if (err.message === 'User not found [403]') {
-            console.log('This email does not exist.');
-          } else {
-            console.log('We are sorry but something went wrong.');
-          }
-        } else {
-            console.log('Email Sent. Check your mailbox.');
-            console.log(email);
-        }
-      });
-
-    return false;
-  },
-});
-
-*/
-
 /// 
 
 	Template.website_item.events({
@@ -470,9 +433,8 @@ Template.ForgotPassword.events({
 			// example of how you can access the id for the website in the database
 			// (this is the data context for the template)
 			var website_id = this._id;
-			// put the code in here to add a vote to a website!	
 				
-				Websites.update({_id:website_id}, {$inc: {upvote: +1}});
+				Meteor.call('upvote',website_id);
 				console.log("Up voting website with id "+website_id);	
 				return false;// prevent the button from reloading the page
 		}, 
@@ -480,9 +442,8 @@ Template.ForgotPassword.events({
 			// example of how you can access the id for the website in the database
 			// (this is the data context for the template)
 			var website_id = this._id;
-	
-			// put the code in here to remove a vote from a website!
-			Websites.update({_id:website_id}, {$inc: {downvote: -1}});
+
+      Meteor.call('downvote',website_id);
 			console.log("Down voting website with id "+website_id);	
 			return false;// prevent the button from reloading the page
 		},
@@ -506,24 +467,11 @@ Template.ForgotPassword.events({
 			url = event.target.url.value;
 			title = event.target.title.value;
 			description = event.target.description.value;
-
-			console.log("The url they entered is: "+url);
 			
-			//  put your website saving code in here!	
-			if (Meteor.user()){
-				Websites.insert({
-    			title:title, 
-    			url:url, 
-    			description:description, 
-    			upvote:0,
-    			downvote:0,
-    			createdOn:new Date()
-    		});
+      Meteor.call('insertSite',url, title, description);
 
     	 	$("#website_form").toggle('slow');
-			return false;// stop the form submit from reloading the page      			
-  		}
-    		
+			return false;// stop the form submit from reloading the page      					
 	   }
 	});
 
@@ -546,4 +494,18 @@ Template.ResetPassword.events({
     return false;
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

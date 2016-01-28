@@ -1,8 +1,6 @@
 // start up function that creates entries in the Websites databases.
   //search function 
 
-
-
 Meteor.startup(function () {
    
 
@@ -81,5 +79,25 @@ function buildRegExp(searchText) {
   var fullExp = exps.join('') + ".+";
   return new RegExp(fullExp, "i");
 }
+
+// publish
+
+Meteor.publish('websites', function(){
+  return Websites.find({}, {sort:{upvote: -1}});
+  
+});
+
+Meteor.publish('userData', function(){
+  /*var currentUserId = this.userId;*/
+  return Meteor.users.find();
+  console.log("ready");
+
+});
+
+
+
+
+
+
 
 

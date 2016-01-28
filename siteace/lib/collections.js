@@ -3,11 +3,9 @@
 
 Websites = new Mongo.Collection("websites");
 
-
-
-/*
 // set up security on Images collection
-Images.allow({
+/*
+Websites.allow({
 
 	// we need to be able to update images for ratings.
 	update:function(userId, doc){

@@ -52,38 +52,66 @@
    margin-bottom: 10px;
 }
 
-/* Register form */
-
-/*.nav li{
-   border-right: 1px solid #000000; 
-}*/
 .navbar {
-   padding-right: 5rem;
+   padding-right: 1.5rem;
+   padding-left: 1.5rem;
    border:none
 }
 
 .nav ~li { border-left: 1px solid #DDD }
+
 .btn-login {
    width: 100%;
 }
+
 .btn-register {
    width: 100%;
 }
+
 label.error {
    color:red;
 }
+
 .pic-profile {
    display: inline;
    padding-top: 0px;
-   width:55px;
-   height:55px;
+   width:58px;
+   height:58px;
    border-radius: 50%;
    padding:10px;
    vertical-align: middle;
 }
+ a.navbar-brand {
+          color:blue !important;
+      }
+      
 a.dropdown-toggle{
    padding-left: 0px !important;
 }
+
 .dropdown-menu{
    margin-top: 10px !important;
 }
+
+
+ /* // Breackpoints // */
+ /*==========  Mobile First Method  ==========*/
+
+
+    /* Small Devices, Tablets */
+    @media only screen and (min-width : 768px) {
+
+    }
+
+    /* Medium Devices, Desktops */
+    @media only screen and (min-width : 992px) {
+
+    }
+
+    /* Large Devices, Wide Screens */
+    @media only screen and (min-width : 1200px) {
+
+    }
+
+
+

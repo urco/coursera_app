@@ -1,0 +1,27 @@
+
+<template name="web_details">
+	 <div class="container">
+		<div class="jumbotron">
+				<div>
+					<a class="btn btn-default" href="/">
+				  		<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+				  		Back to website list
+					</a>
+				</div>
+				<!--<h2>Crashing meteor routing</h2>-->
+				<h2>{{title}}</h2>
+				<p>{{description}}</p>
+				<a href="{{url}}">{{url}}</a>
+				<div class="social">
+					{{> article}}	
+				</div>
+				<div class="comment-section">
+		   			 {{> commentsBox id=_id}}
+		   			 {{> myComments}}
+				</div>
+					
+				<div>
+			</div>
+		</div>	
+	 </div>	
+</template>

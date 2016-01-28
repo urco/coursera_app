@@ -1,0 +1,19 @@
+
+<!-- template that displays searched website items  -->
+<template name="searchResult">
+	<div class="container">
+		<div class="jumbotron searchResult">	
+			<h3> Search results </h3>
+				<ol>
+					{{#each getItems}}
+						{{> website_item_search}}		
+					{{/each}}
+				</ol>
+			<!--<div id="search-meta">
+	      		{{#if isLoading}}
+	        		searching ...
+	      		{{/if}}
+    		</div>-->
+		</div>	
+	</div>
+</template>	
